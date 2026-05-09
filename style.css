@@ -341,6 +341,13 @@ main {
   transform: scale(1.07);
 }
 
+.tray-item.selected {
+  border-color: var(--gold);
+  background: var(--gold-dim);
+  transform: scale(1.07);
+  box-shadow: 0 0 14px rgba(200, 170, 110, 0.5);
+}
+
 .tray-item.dragging {
   opacity: 0.5;
   cursor: grabbing;
@@ -541,4 +548,52 @@ main {
 
 .target-item img, .components-given img {
   animation: pop-in 0.25s ease;
+}
+
+/* ── Mobile ── */
+
+@media (max-width: 580px) {
+  body { padding: 16px 12px 40px; }
+
+  h1 { font-size: 1.4rem; }
+  .subtitle { font-size: 0.7rem; margin-bottom: 14px; }
+
+  .mode-tabs { gap: 6px; }
+  .tab { padding: 7px 13px; font-size: 0.8rem; }
+
+  .score-bar { gap: 12px; font-size: 0.8rem; }
+
+  .game-section { padding: 20px 14px; gap: 18px; }
+
+  /* Target item */
+  .target-item img { width: 72px; height: 72px; }
+  .item-name { font-size: 1rem; }
+
+  /* Drop zones */
+  .drop-zone { width: 72px; height: 72px; }
+  .drop-zone img { width: 56px; height: 56px; }
+  .slot-label { font-size: 0.6rem; max-width: 76px; }
+  .operator { margin-top: 24px; font-size: 1.2rem; }
+
+  /* Component tray */
+  .tray-item { width: 54px; height: 54px; }
+  .tray-item img { width: 40px; height: 40px; }
+  .tray-label { font-size: 0.65rem; }
+
+  /* Mode 2 */
+  .components-given { gap: 10px; }
+  .comp-display img { width: 56px; height: 56px; }
+  .question-mark { width: 56px; height: 56px; font-size: 1.6rem; }
+  .operator.large { font-size: 1.3rem; }
+
+  .choices-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .choice-card { padding: 10px 6px 8px; gap: 7px; }
+  .choice-card img { width: 52px; height: 52px; }
+  .choice-name { font-size: 0.68rem; }
+
+  /* Tooltip — keep it narrower on small screens */
+  .item-tooltip { max-width: 220px; }
+
+  /* Next button — full width for easy tapping */
+  .btn-next { width: 100%; text-align: center; }
 }

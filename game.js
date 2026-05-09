@@ -25,7 +25,6 @@ const COMPONENTS = [
   { id: 'SparringGloves',     name: 'Sparring Gloves',       img: BASE + 'SparringGloves.png' },
 ];
 
-// Stat shorthand: v = value string, l = label (must match a key in STAT_COLORS)
 const ITEMS = [
   // B.F. Sword
   {
@@ -271,13 +270,43 @@ function itemFromComponents(a, b) {
   return ITEMS.find(item => [...item.components].sort().join('|') === key);
 }
 
+// ── Slot helpers ───────────────────────────────────────────────────────────
+
 function clearSlot(i) {
   m1Slots[i] = null;
   const zone  = document.getElementById(i === 0 ? 'drop1' : 'drop2');
   const label = document.getElementById(`slot${i + 1}-label`);
-  zone.innerHTML = '<span class="placeholder">Drop here</span>';
+  zone.innerHTML = '<span class="placeholder">+</span>';
   zone.className = 'drop-zone';
   label.textContent = '';
+}
+
+// Place a component in a slot, wire up drag-to-lift, then check if complete.
+function placeComp(i, comp) {
+  const zone  = document.getElementById(i === 0 ? 'drop1' : 'drop2');
+  const label = document.getElementById(`slot${i + 1}-label`);
+
+  m1Slots[i] = comp.id;
+  zone.innerHTML = `<img src="${comp.img}" alt="${comp.name}">`;
+  zone.className = 'drop-zone';
+  label.textContent = comp.name;
+
+  const placedImg = zone.querySelector('img');
+  placedImg.draggable = true;
+
+  placedImg.addEventListener('dragstart', ev => {
+    if (answered) { ev.preventDefault(); return; }
+    ev.dataTransfer.setData('compId', comp.id);
+    dragSourceSlot = i;
+    setTimeout(() => { placedImg.style.opacity = '0.25'; }, 0);
+  });
+
+  placedImg.addEventListener('dragend', () => {
+    placedImg.style.opacity = '';
+    if (dragSourceSlot === i) { clearSlot(i); dragSourceSlot = -1; }
+  });
+
+  if (m1Slots[0] && m1Slots[1]) checkMode1();
 }
 
 // ── Tooltip ────────────────────────────────────────────────────────────────
@@ -306,11 +335,9 @@ function hideTooltip() { tooltip.hidden = true; }
 function placeTooltip(cx, cy) {
   const tw = tooltip.offsetWidth;
   const th = tooltip.offsetHeight;
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
   const ox = 16, oy = 12;
-  tooltip.style.left = (cx + ox + tw > vw ? cx - ox - tw : cx + ox) + 'px';
-  tooltip.style.top  = (cy + oy + th > vh ? cy - oy - th : cy + oy) + 'px';
+  tooltip.style.left = (cx + ox + tw > window.innerWidth  ? cx - ox - tw : cx + ox) + 'px';
+  tooltip.style.top  = (cy + oy + th > window.innerHeight ? cy - oy - th : cy + oy) + 'px';
 }
 
 document.addEventListener('mousemove', e => {
@@ -329,9 +356,17 @@ let mode = 1;
 let currentItem = null;
 let m1Slots = [null, null];
 let m1Queue = [];
-let dragSourceSlot = -1;
 let m2Queue = [];
 let answered = false;
+let dragSourceSlot = -1;
+let selectedComp = null;   // tapped component waiting to be placed (mobile/tap UX)
+
+// ── Tray selection (tap-to-place) ──────────────────────────────────────────
+
+function clearTraySelection() {
+  selectedComp = null;
+  document.querySelectorAll('.tray-item.selected').forEach(el => el.classList.remove('selected'));
+}
 
 // ── Score ──────────────────────────────────────────────────────────────────
 
@@ -352,6 +387,7 @@ function recordResult(correct) {
 function setMode(m) {
   mode = m;
   hideTooltip();
+  clearTraySelection();
   document.getElementById('mode1').classList.toggle('hidden', m !== 1);
   document.getElementById('mode2').classList.toggle('hidden', m !== 2);
   document.getElementById('tab-mode1').classList.toggle('active', m === 1);
@@ -368,6 +404,7 @@ function nextMode1() {
   dragSourceSlot = -1;
   answered = false;
   hideTooltip();
+  clearTraySelection();
 
   document.getElementById('m1-target-img').src = currentItem.img;
   document.getElementById('m1-target-img').alt = currentItem.name;
@@ -382,19 +419,14 @@ function nextMode1() {
   feedback.className = 'feedback';
 
   document.getElementById('m1-next').classList.add('hidden');
-  document.getElementById('slot1-label').textContent = '';
-  document.getElementById('slot2-label').textContent = '';
-
-  const d1 = document.getElementById('drop1');
-  const d2 = document.getElementById('drop2');
-  d1.innerHTML = '<span class="placeholder">Drop here</span>';
-  d2.innerHTML = '<span class="placeholder">Drop here</span>';
-  d1.className = 'drop-zone';
-  d2.className = 'drop-zone';
+  clearSlot(0);
+  clearSlot(1);
 }
 
 function checkMode1() {
   answered = true;
+  clearTraySelection();
+
   const correct   = [...currentItem.components].sort();
   const given     = [...m1Slots].sort();
   const isCorrect = correct[0] === given[0] && correct[1] === given[1];
@@ -434,12 +466,26 @@ function buildTray() {
     div.dataset.compId = comp.id;
     div.innerHTML = `<img src="${comp.img}" alt="${comp.name}"><span class="tray-tooltip">${comp.name}</span>`;
 
+    // Drag (desktop)
     div.addEventListener('dragstart', e => {
       e.dataTransfer.setData('compId', comp.id);
       div.classList.add('dragging');
       hideTooltip();
+      clearTraySelection();
     });
     div.addEventListener('dragend', () => div.classList.remove('dragging'));
+
+    // Tap (mobile + desktop fallback)
+    div.addEventListener('click', () => {
+      if (answered) return;
+      if (selectedComp === comp) {
+        clearTraySelection();
+      } else {
+        clearTraySelection();
+        selectedComp = comp;
+        div.classList.add('selected');
+      }
+    });
 
     tray.appendChild(div);
   });
@@ -447,9 +493,9 @@ function buildTray() {
 
 function setupDropZones() {
   ['drop1', 'drop2'].forEach((id, i) => {
-    const zone  = document.getElementById(id);
-    const label = document.getElementById(`slot${i + 1}-label`);
+    const zone = document.getElementById(id);
 
+    // Drag events
     zone.addEventListener('dragover', e => {
       e.preventDefault();
       if (!answered) zone.classList.add('drag-over');
@@ -465,40 +511,28 @@ function setupDropZones() {
       zone.classList.remove('drag-over');
       if (answered) return;
 
-      const compId    = e.dataTransfer.getData('compId');
-      const comp      = getComp(compId);
       const sourceSlot = dragSourceSlot;
-      dragSourceSlot  = -1;
+      dragSourceSlot = -1;
+      clearTraySelection();
 
-      // If dragged from the other slot, clear it
       if (sourceSlot !== -1 && sourceSlot !== i) clearSlot(sourceSlot);
+      placeComp(i, getComp(e.dataTransfer.getData('compId')));
+    });
 
-      m1Slots[i] = compId;
-      zone.innerHTML = `<img src="${comp.img}" alt="${comp.name}">`;
-      zone.className = 'drop-zone';
-      label.textContent = comp.name;
-
-      const placedImg = zone.querySelector('img');
-      placedImg.draggable = true;
-
-      placedImg.addEventListener('dragstart', ev => {
-        if (answered) { ev.preventDefault(); return; }
-        ev.dataTransfer.setData('compId', comp.id);
-        dragSourceSlot = i;
-        // Defer the dim so the browser captures the ghost at full opacity first
-        setTimeout(() => { placedImg.style.opacity = '0.25'; }, 0);
-      });
-
-      placedImg.addEventListener('dragend', () => {
-        placedImg.style.opacity = '';
-        // If drag ended without a valid drop, clear the slot
-        if (dragSourceSlot === i) {
-          clearSlot(i);
-          dragSourceSlot = -1;
-        }
-      });
-
-      if (m1Slots[0] && m1Slots[1]) checkMode1();
+    // Tap (mobile + desktop fallback)
+    zone.addEventListener('click', () => {
+      if (answered) return;
+      if (selectedComp) {
+        // Place the selected tray component
+        placeComp(i, selectedComp);
+        clearTraySelection();
+      } else if (m1Slots[i]) {
+        // Lift the placed component back as the active selection
+        const comp = getComp(m1Slots[i]);
+        clearSlot(i);
+        const trayEl = document.querySelector(`.tray-item[data-comp-id="${comp.id}"]`);
+        if (trayEl) { selectedComp = comp; trayEl.classList.add('selected'); }
+      }
     });
   });
 }
@@ -546,17 +580,8 @@ function nextMode2() {
 
 function buildMode2Choices(correctItem) {
   const [c1, c2] = correctItem.components;
-
-  const related = ITEMS.filter(item =>
-    item.id !== correctItem.id &&
-    (item.components.includes(c1) || item.components.includes(c2))
-  );
-  const unrelated = ITEMS.filter(item =>
-    item.id !== correctItem.id &&
-    !item.components.includes(c1) &&
-    !item.components.includes(c2)
-  );
-
+  const related   = ITEMS.filter(item => item.id !== correctItem.id && (item.components.includes(c1) || item.components.includes(c2)));
+  const unrelated = ITEMS.filter(item => item.id !== correctItem.id && !item.components.includes(c1) && !item.components.includes(c2));
   const distractors = [...shuffle(related).slice(0, 5), ...shuffle(unrelated)].slice(0, 5);
   return shuffle([correctItem, ...distractors]);
 }
@@ -564,11 +589,9 @@ function buildMode2Choices(correctItem) {
 function checkMode2(selectedId, card) {
   answered = true;
   recordResult(selectedId === currentItem.id);
-
   document.querySelectorAll('.choice-card').forEach(c => c.classList.add('disabled'));
 
   const feedback = document.getElementById('m2-feedback');
-
   if (selectedId === currentItem.id) {
     card.classList.add('correct');
     feedback.textContent = '✓ Correct!';
@@ -579,7 +602,6 @@ function checkMode2(selectedId, card) {
     feedback.textContent = `✗  The answer was ${currentItem.name}`;
     feedback.className = 'feedback wrong';
   }
-
   document.getElementById('m2-next').classList.remove('hidden');
 }
 
