@@ -1,0 +1,279 @@
+/* ── Site navigation ── */
+
+.site-nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 0.82rem;
+}
+
+.site-nav a {
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 4px 10px;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  transition: all 0.18s;
+}
+
+.site-nav a:hover { color: var(--gold); border-color: var(--border); }
+
+.site-nav .nav-active {
+  color: var(--gold);
+  border-color: var(--gold);
+}
+
+.nav-sep { color: var(--text-muted); }
+
+/* ── Ability display (mode 1) ── */
+
+.ability-display {
+  background: var(--surface2);
+  border: 1px solid var(--gold);
+  border-radius: 10px;
+  padding: 18px 22px;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+}
+
+.ability-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--gold-light);
+  margin-bottom: 8px;
+}
+
+.ability-desc {
+  font-size: 0.85rem;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+/* ── Portrait cards (mode 1 + mode 4 choices) ── */
+
+.portrait-grid {
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 10px;
+}
+
+.portrait-card {
+  background: var(--surface2);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.18s, transform 0.1s, background 0.18s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.portrait-card:hover:not(.disabled) {
+  border-color: var(--gold);
+  transform: scale(1.03);
+}
+
+.portrait-card img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  display: block;
+}
+
+.portrait-card .card-name {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  padding: 5px 4px;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.portrait-card.correct { border-color: var(--correct); background: var(--correct-bg); }
+.portrait-card.correct .card-name { color: var(--correct); }
+.portrait-card.wrong { border-color: var(--wrong); background: var(--wrong-bg); animation: shake 0.4s ease; }
+.portrait-card.disabled { cursor: default; pointer-events: none; }
+
+/* ── Champion display (modes 2, 3) ── */
+
+.champion-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.champ-portrait-lg {
+  width: 160px;
+  height: 160px;
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface2);
+}
+
+.champ-portrait-lg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.champ-portrait-xl {
+  width: 220px;
+  height: 220px;
+  border: 2px solid var(--gold);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--surface2);
+}
+
+.champ-portrait-xl img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.champ-name-lg {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--gold-light);
+}
+
+/* ── Ability cards (mode 2) ── */
+
+.ability-grid {
+  grid-template-columns: repeat(2, 1fr) !important;
+}
+
+.ability-card {
+  background: var(--surface2);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 12px;
+  cursor: pointer;
+  transition: border-color 0.18s, background 0.18s, transform 0.1s;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ability-card:hover:not(.disabled) {
+  border-color: var(--gold);
+  background: var(--gold-dim);
+  transform: scale(1.02);
+}
+
+.ability-card .card-ability-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--gold-light);
+}
+
+.ability-card .card-ability-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.ability-card.correct { border-color: var(--correct); background: var(--correct-bg); }
+.ability-card.correct .card-ability-name,
+.ability-card.correct .card-ability-desc { color: var(--correct); }
+.ability-card.wrong { border-color: var(--wrong); background: var(--wrong-bg); animation: shake 0.4s ease; }
+.ability-card.disabled { cursor: default; pointer-events: none; }
+
+/* ── Trait chips (mode 3) ── */
+
+.trait-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+.trait-chip {
+  background: var(--surface2);
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: border-color 0.18s, background 0.18s, transform 0.1s;
+  user-select: none;
+  color: var(--text-muted);
+}
+
+.trait-chip:hover:not(.disabled) { border-color: var(--gold); background: var(--gold-dim); color: var(--gold-light); }
+.trait-chip.selected { border-color: var(--gold); background: var(--gold-dim); color: var(--gold-light); }
+.trait-chip.correct { border-color: var(--correct); background: var(--correct-bg); color: var(--correct); }
+.trait-chip.wrong { border-color: var(--wrong); background: var(--wrong-bg); color: var(--wrong); }
+.trait-chip.missed { border-color: var(--correct); background: var(--correct-bg); color: var(--correct); opacity: 0.55; }
+.trait-chip.disabled { cursor: default; pointer-events: none; }
+
+/* ── Name cards (mode 4) ── */
+
+.name-grid {
+  grid-template-columns: repeat(2, 1fr) !important;
+}
+
+.name-card {
+  background: var(--surface2);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.18s, background 0.18s, transform 0.1s;
+  color: var(--text);
+}
+
+.name-card:hover:not(.disabled) {
+  border-color: var(--gold);
+  background: var(--gold-dim);
+  color: var(--gold-light);
+  transform: scale(1.02);
+}
+
+.name-card.correct { border-color: var(--correct); background: var(--correct-bg); color: var(--correct); }
+.name-card.wrong { border-color: var(--wrong); background: var(--wrong-bg); color: var(--wrong); animation: shake 0.4s ease; }
+.name-card.disabled { cursor: default; pointer-events: none; }
+
+/* ── Cost badges ── */
+
+.cost-badge {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  vertical-align: middle;
+  margin-left: 4px;
+  color: #fff;
+}
+
+/* ── Mobile ── */
+
+@media (max-width: 580px) {
+  .portrait-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .ability-grid { grid-template-columns: 1fr !important; }
+
+  .champ-portrait-xl { width: 160px; height: 160px; }
+  .champ-portrait-lg { width: 120px; height: 120px; }
+
+  .ability-card { padding: 10px; }
+  .ability-card .card-ability-name { font-size: 0.78rem; }
+  .ability-card .card-ability-desc { font-size: 0.7rem; }
+
+  .trait-chip { font-size: 0.76rem; padding: 5px 12px; }
+
+  .name-card { font-size: 0.82rem; padding: 11px 8px; }
+
+  .ability-display { padding: 14px 16px; }
+  .ability-name { font-size: 0.95rem; }
+  .ability-desc { font-size: 0.8rem; }
+}

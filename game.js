@@ -306,7 +306,120 @@ function placeComp(i, comp) {
     if (dragSourceSlot === i) { clearSlot(i); dragSourceSlot = -1; }
   });
 
+  addTouchDrag(placedImg, comp, i);
+
   if (m1Slots[0] && m1Slots[1]) checkMode1();
+}
+
+// ── Touch drag ────────────────────────────────────────────────────────────
+// HTML5 DnD doesn't fire on touch screens, so we implement drag manually.
+
+let touchDragComp  = null;
+let touchDragGhost = null;
+let touchDragSlot  = -1;      // slot index if dragging from a placed slot, else -1
+let touchStartX    = 0;
+let touchStartY    = 0;
+const DRAG_THRESHOLD = 8;     // px of movement before ghost appears
+
+function createGhost(comp, x, y) {
+  const g = document.createElement('div');
+  g.className = 'drag-ghost';
+  g.innerHTML = `<img src="${comp.img}" alt="${comp.name}">`;
+  g.style.left = (x - 36) + 'px';
+  g.style.top  = (y - 36) + 'px';
+  document.body.appendChild(g);
+  return g;
+}
+
+function moveGhost(x, y) {
+  if (touchDragGhost) {
+    touchDragGhost.style.left = (x - 36) + 'px';
+    touchDragGhost.style.top  = (y - 36) + 'px';
+  }
+}
+
+function removeGhost() {
+  if (touchDragGhost) { touchDragGhost.remove(); touchDragGhost = null; }
+}
+
+function getDropZoneAt(x, y) {
+  // Ghost has pointer-events:none so elementFromPoint sees through it
+  const el = document.elementFromPoint(x, y);
+  if (!el) return -1;
+  const zone = el.closest('#drop1, #drop2');
+  return zone ? (zone.id === 'drop1' ? 0 : 1) : -1;
+}
+
+function endTouchDrag(placed) {
+  if (touchDragSlot !== -1) {
+    const srcZone = document.getElementById(touchDragSlot === 0 ? 'drop1' : 'drop2');
+    const img = srcZone.querySelector('img');
+    if (img) img.style.opacity = '';
+  }
+  document.getElementById('drop1').classList.remove('drag-over');
+  document.getElementById('drop2').classList.remove('drag-over');
+  removeGhost();
+  if (!placed && touchDragSlot !== -1) clearSlot(touchDragSlot);
+  touchDragComp = null;
+  touchDragSlot = -1;
+}
+
+function addTouchDrag(el, comp, slotIndex) {
+  el.addEventListener('touchstart', e => {
+    if (answered) return;
+    const t = e.touches[0];
+    touchStartX   = t.clientX;
+    touchStartY   = t.clientY;
+    touchDragComp = comp;
+    touchDragSlot = slotIndex;
+  }, { passive: true });
+
+  el.addEventListener('touchmove', e => {
+    if (!touchDragComp) return;
+    const t = e.touches[0];
+
+    if (!touchDragGhost) {
+      const dx = t.clientX - touchStartX;
+      const dy = t.clientY - touchStartY;
+      if (Math.sqrt(dx * dx + dy * dy) < DRAG_THRESHOLD) return;
+      // Threshold exceeded — create ghost and dim source slot if applicable
+      touchDragGhost = createGhost(touchDragComp, t.clientX, t.clientY);
+      if (touchDragSlot !== -1) {
+        const srcZone = document.getElementById(touchDragSlot === 0 ? 'drop1' : 'drop2');
+        const img = srcZone.querySelector('img');
+        if (img) img.style.opacity = '0.25';
+      }
+      clearTraySelection();
+    }
+
+    e.preventDefault();
+    moveGhost(t.clientX, t.clientY);
+
+    const over = getDropZoneAt(t.clientX, t.clientY);
+    document.getElementById('drop1').classList.toggle('drag-over', over === 0 && !answered);
+    document.getElementById('drop2').classList.toggle('drag-over', over === 1 && !answered);
+  }, { passive: false });
+
+  const finishTouch = e => {
+    if (!touchDragComp) return;
+    if (!touchDragGhost) { touchDragComp = null; touchDragSlot = -1; return; } // was a tap
+
+    const t = e.changedTouches[0];
+    const dropIndex = getDropZoneAt(t.clientX, t.clientY);
+
+    if (dropIndex !== -1 && !answered) {
+      const src = touchDragSlot;
+      endTouchDrag(true);
+      if (src !== -1 && src !== dropIndex) clearSlot(src);
+      placeComp(dropIndex, comp);
+      clearTraySelection();
+    } else {
+      endTouchDrag(false); // clears source slot if dragged from one
+    }
+  };
+
+  el.addEventListener('touchend',    finishTouch);
+  el.addEventListener('touchcancel', finishTouch);
 }
 
 // ── Tooltip ────────────────────────────────────────────────────────────────
@@ -475,6 +588,8 @@ function buildTray() {
     });
     div.addEventListener('dragend', () => div.classList.remove('dragging'));
 
+    addTouchDrag(div, comp, -1);
+
     // Tap (mobile + desktop fallback)
     div.addEventListener('click', () => {
       if (answered) return;
@@ -494,6 +609,7 @@ function buildTray() {
 function setupDropZones() {
   ['drop1', 'drop2'].forEach((id, i) => {
     const zone = document.getElementById(id);
+    let dropJustFired = false;
 
     // Drag events
     zone.addEventListener('dragover', e => {
@@ -511,6 +627,9 @@ function setupDropZones() {
       zone.classList.remove('drag-over');
       if (answered) return;
 
+      // Suppress the click event that some browsers fire after a drop
+      dropJustFired = true;
+
       const sourceSlot = dragSourceSlot;
       dragSourceSlot = -1;
       clearTraySelection();
@@ -521,9 +640,9 @@ function setupDropZones() {
 
     // Tap (mobile + desktop fallback)
     zone.addEventListener('click', () => {
+      if (dropJustFired) { dropJustFired = false; return; }
       if (answered) return;
       if (selectedComp) {
-        // Place the selected tray component
         placeComp(i, selectedComp);
         clearTraySelection();
       } else if (m1Slots[i]) {

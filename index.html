@@ -3,89 +3,109 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TFT Item Trainer — Set 17</title>
+  <title>TFT Trainer — Set 17</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="champions.css">
+  <style>
+    .landing-cards {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .landing-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 36px 32px;
+      width: 280px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text);
+      transition: border-color 0.18s, background 0.18s, transform 0.15s;
+      cursor: pointer;
+    }
+
+    .landing-card:hover {
+      border-color: var(--gold);
+      background: var(--surface2);
+      transform: translateY(-3px);
+    }
+
+    .landing-card-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--gold-light);
+      letter-spacing: 0.5px;
+    }
+
+    .landing-card-modes {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      width: 100%;
+    }
+
+    .landing-mode {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      padding: 5px 10px;
+      background: var(--surface2);
+      border-radius: 5px;
+      text-align: center;
+    }
+
+    .landing-card:hover .landing-mode {
+      background: var(--surface3);
+    }
+
+    .landing-card-cta {
+      margin-top: 8px;
+      background: var(--gold);
+      color: #080C18;
+      border-radius: 6px;
+      padding: 8px 24px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+  </style>
 </head>
 <body>
   <header>
-    <h1>TFT Item Trainer</h1>
+    <h1>TFT Trainer</h1>
     <p class="subtitle">Set 17 · Space Gods</p>
-    <div class="mode-tabs">
-      <button id="tab-mode1" class="tab active">Item → Components</button>
-      <button id="tab-mode2" class="tab">Components → Item</button>
-    </div>
-    <div class="score-bar">
-      <span id="score-display">Score: 0 / 0</span>
-      <span id="streak-display">Streak: 0</span>
-      <button id="reset-btn" class="btn-reset">Reset</button>
-    </div>
   </header>
 
-  <main>
-    <!-- Mode 1: Given an item, drag the two components -->
-    <section id="mode1" class="game-section">
-      <p class="prompt-label">What two components combine to make...</p>
+  <main style="display:flex; justify-content:center;">
+    <div class="landing-cards">
 
-      <div class="target-item">
-        <img id="m1-target-img" src="" alt="">
-        <div id="m1-target-name" class="item-name"></div>
-      </div>
-
-      <div class="drop-area">
-        <div class="drop-slot">
-          <div class="drop-zone" id="drop1" data-slot="0">
-            <span class="placeholder">Drop here</span>
-          </div>
-          <div class="slot-label" id="slot1-label"></div>
+      <a href="items.html" class="landing-card">
+        <div class="landing-card-title">Item Trainer</div>
+        <div class="landing-card-modes">
+          <div class="landing-mode">Item → Components</div>
+          <div class="landing-mode">Components → Item</div>
         </div>
-        <div class="operator">+</div>
-        <div class="drop-slot">
-          <div class="drop-zone" id="drop2" data-slot="1">
-            <span class="placeholder">Drop here</span>
-          </div>
-          <div class="slot-label" id="slot2-label"></div>
+        <div class="landing-card-cta">Play →</div>
+      </a>
+
+      <a href="champions.html" class="landing-card">
+        <div class="landing-card-title">Champion Trainer</div>
+        <div class="landing-card-modes">
+          <div class="landing-mode">Portrait → Name</div>
+          <div class="landing-mode">Champion → Traits</div>
+          <div class="landing-mode">Ability → Champion</div>
+          <div class="landing-mode">Champion → Ability</div>
         </div>
-      </div>
+        <div class="landing-card-cta">Play →</div>
+      </a>
 
-      <div id="m1-feedback" class="feedback"></div>
-      <button id="m1-next" class="btn-next hidden">Next Item →</button>
-
-      <div class="component-tray">
-        <div class="tray-label">Components — drag to the slots above</div>
-        <div id="component-tray" class="tray-items"></div>
-      </div>
-    </section>
-
-    <!-- Mode 2: Given two components, select the item they make -->
-    <section id="mode2" class="game-section hidden">
-      <p class="prompt-label">These two components combine into...</p>
-
-      <div class="components-given">
-        <div class="comp-display">
-          <img id="m2-comp1-img" src="" alt="">
-          <span id="m2-comp1-name" class="comp-name"></span>
-        </div>
-        <div class="operator large">+</div>
-        <div class="comp-display">
-          <img id="m2-comp2-img" src="" alt="">
-          <span id="m2-comp2-name" class="comp-name"></span>
-        </div>
-        <div class="operator large">=</div>
-        <div class="question-mark">?</div>
-      </div>
-
-      <div id="choices-grid" class="choices-grid"></div>
-      <div id="m2-feedback" class="feedback"></div>
-      <button id="m2-next" class="btn-next hidden">Next →</button>
-    </section>
+    </div>
   </main>
-
-  <div id="item-tooltip" class="item-tooltip" hidden>
-    <div class="tooltip-name"></div>
-    <div class="tooltip-stats"></div>
-    <div class="tooltip-desc"></div>
-  </div>
-
-  <script src="game.js"></script>
 </body>
 </html>

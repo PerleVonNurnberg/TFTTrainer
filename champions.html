@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TFT Champion Trainer — Set 17</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="champions.css">
+</head>
+<body>
+  <header>
+    <nav class="site-nav">
+      <a href="index.html">Home</a>
+      <span class="nav-sep">·</span>
+      <a href="items.html">Item Trainer</a>
+      <span class="nav-sep">·</span>
+      <a href="champions.html" class="nav-active">Champion Trainer</a>
+    </nav>
+    <h1>TFT Champion Trainer</h1>
+    <p class="subtitle">Set 17 · Space Gods</p>
+    <div class="mode-tabs">
+      <button id="tab-m4" class="tab active">Portrait → Name</button>
+      <button id="tab-m3" class="tab">Champion → Traits</button>
+      <button id="tab-m1" class="tab">Ability → Champion</button>
+      <button id="tab-m2" class="tab">Champion → Ability</button>
+    </div>
+    <div class="score-bar">
+      <span id="score-display">Score: 0 / 0</span>
+      <span id="streak-display">Streak: 0</span>
+      <button id="reset-btn" class="btn-reset">Reset</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Mode 1: Ability → Champion -->
+    <section id="mode1" class="game-section hidden">
+      <p class="prompt-label">Which champion has this ability?</p>
+
+      <div class="ability-display">
+        <div class="ability-name" id="m1-ability-name"></div>
+        <div class="ability-desc" id="m1-ability-desc"></div>
+      </div>
+
+      <div class="choices-grid portrait-grid" id="m1-choices"></div>
+      <div id="m1-feedback" class="feedback"></div>
+      <button id="m1-next" class="btn-next hidden">Next →</button>
+    </section>
+
+    <!-- Mode 2: Champion → Ability -->
+    <section id="mode2" class="game-section hidden">
+      <p class="prompt-label">What is this champion's ability?</p>
+
+      <div class="champion-display">
+        <div class="champ-portrait-lg">
+          <img id="m2-portrait" src="" alt="">
+        </div>
+        <div class="champ-name-lg" id="m2-name"></div>
+      </div>
+
+      <div class="choices-grid ability-grid" id="m2-choices"></div>
+      <div id="m2-feedback" class="feedback"></div>
+      <button id="m2-next" class="btn-next hidden">Next →</button>
+    </section>
+
+    <!-- Mode 3: Champion → Traits -->
+    <section id="mode3" class="game-section hidden">
+      <p class="prompt-label">Select all of this champion's traits</p>
+
+      <div class="champion-display">
+        <div class="champ-portrait-lg">
+          <img id="m3-portrait" src="" alt="">
+        </div>
+        <div class="champ-name-lg" id="m3-name"></div>
+      </div>
+
+      <div class="trait-chips" id="m3-traits"></div>
+      <button id="m3-submit" class="btn-next">Submit</button>
+      <div id="m3-feedback" class="feedback"></div>
+      <button id="m3-next" class="btn-next hidden">Next →</button>
+    </section>
+
+    <!-- Mode 4: Portrait → Name -->
+    <section id="mode4" class="game-section">
+      <p class="prompt-label">Who is this champion?</p>
+
+      <div class="champ-portrait-xl">
+        <img id="m4-portrait" src="" alt="?">
+      </div>
+
+      <div class="choices-grid name-grid" id="m4-choices"></div>
+      <div id="m4-feedback" class="feedback"></div>
+      <button id="m4-next" class="btn-next hidden">Next →</button>
+    </section>
+  </main>
+
+  <script src="champions.js"></script>
+</body>
+</html>

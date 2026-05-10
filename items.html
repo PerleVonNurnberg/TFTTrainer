@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TFT Item Trainer — Set 17</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="champions.css">
+</head>
+<body>
+  <header>
+    <nav class="site-nav">
+      <a href="index.html">Home</a>
+      <span class="nav-sep">·</span>
+      <a href="items.html" class="nav-active">Item Trainer</a>
+      <span class="nav-sep">·</span>
+      <a href="champions.html">Champion Trainer</a>
+    </nav>
+    <h1>TFT Item Trainer</h1>
+    <p class="subtitle">Set 17 · Space Gods</p>
+    <div class="mode-tabs">
+      <button id="tab-mode1" class="tab active">Item → Components</button>
+      <button id="tab-mode2" class="tab">Components → Item</button>
+    </div>
+    <div class="score-bar">
+      <span id="score-display">Score: 0 / 0</span>
+      <span id="streak-display">Streak: 0</span>
+      <button id="reset-btn" class="btn-reset">Reset</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Mode 1: Given an item, drag the two components -->
+    <section id="mode1" class="game-section">
+      <p class="prompt-label">What two components combine to make...</p>
+
+      <div class="target-item">
+        <img id="m1-target-img" src="" alt="">
+        <div id="m1-target-name" class="item-name"></div>
+      </div>
+
+      <div class="drop-area">
+        <div class="drop-slot">
+          <div class="drop-zone" id="drop1" data-slot="0">
+            <span class="placeholder">Drop here</span>
+          </div>
+          <div class="slot-label" id="slot1-label"></div>
+        </div>
+        <div class="operator">+</div>
+        <div class="drop-slot">
+          <div class="drop-zone" id="drop2" data-slot="1">
+            <span class="placeholder">Drop here</span>
+          </div>
+          <div class="slot-label" id="slot2-label"></div>
+        </div>
+      </div>
+
+      <div id="m1-feedback" class="feedback"></div>
+      <button id="m1-next" class="btn-next hidden">Next Item →</button>
+
+      <div class="component-tray">
+        <div class="tray-label">Components — drag to the slots above</div>
+        <div id="component-tray" class="tray-items"></div>
+      </div>
+    </section>
+
+    <!-- Mode 2: Given two components, select the item they make -->
+    <section id="mode2" class="game-section hidden">
+      <p class="prompt-label">These two components combine into...</p>
+
+      <div class="components-given">
+        <div class="comp-display">
+          <img id="m2-comp1-img" src="" alt="">
+          <span id="m2-comp1-name" class="comp-name"></span>
+        </div>
+        <div class="operator large">+</div>
+        <div class="comp-display">
+          <img id="m2-comp2-img" src="" alt="">
+          <span id="m2-comp2-name" class="comp-name"></span>
+        </div>
+        <div class="operator large">=</div>
+        <div class="question-mark">?</div>
+      </div>
+
+      <div id="choices-grid" class="choices-grid"></div>
+      <div id="m2-feedback" class="feedback"></div>
+      <button id="m2-next" class="btn-next hidden">Next →</button>
+    </section>
+  </main>
+
+  <div id="item-tooltip" class="item-tooltip" hidden>
+    <div class="tooltip-name"></div>
+    <div class="tooltip-stats"></div>
+    <div class="tooltip-desc"></div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
